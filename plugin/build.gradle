@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.1.2' // Plugin Shadow pour regrouper les dépendances
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 group = 'com.dalvi'
@@ -9,38 +9,43 @@ description = 'WebVoiceChatPlugin'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17) // Spigot 1.17+ nécessite Java 17
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
 repositories {
     mavenCentral()
     maven {
-        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' // Dépôt Spigot API
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
     }
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT' // Dépendance Spigot API
-//    implementation 'org.java-websocket:Java-WebSocket:1.5.2' // Bibliothèque WebSocket
-    implementation 'com.google.code.gson:gson:2.9.0' // Bibliothèque Gson
+    compileOnly 'org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT'
+    implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'org.eclipse.jetty:jetty-server:11.0.16'
     implementation 'org.eclipse.jetty:jetty-servlet:11.0.16'
     implementation 'org.eclipse.jetty.websocket:websocket-jetty-server:11.0.16'
 }
 
-tasks {
-    shadowJar {
-        archiveBaseName.set('WebVoiceChatPlugin')
-        archiveVersion.set('') // Pas de version dans le nom du .jar
-        archiveClassifier.set('') // Supprime le suffixe "-all" dans le nom du fichier .jar
-    }
+tasks.named('shadowJar') {
+    archiveBaseName.set('WebVoiceChatPlugin')
+    archiveVersion.set('')
+    archiveClassifier.set('')
 }
 
 jar {
-    enabled = false // Désactiver la tâche jar par défaut, on utilise shadowJar
+    enabled = false
 }
 
-build {
-    dependsOn shadowJar // Génère un fichier .jar ombré lors de la construction
+tasks.register('copyJar', Copy) {
+    dependsOn tasks.named('shadowJar')
+
+    from(tasks.named('shadowJar').flatMap { it.archiveFile })
+    into("C:/Users/zttde/Desktop/Test Server/plugins")
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('shadowJar')
+    finalizedBy tasks.named('copyJar')
 }

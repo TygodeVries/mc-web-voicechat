@@ -110,3 +110,4 @@ fabric.properties
 # resources 
 plugin/src/main/resources/web/*
 /.idea
+/node_modules
